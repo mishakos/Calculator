@@ -1,26 +1,29 @@
 ﻿$(document).ready(function () {
-    $.get("/calculator/operationtypes").done(data => {
+    $.get("api/operations").done(data => {
         data.map(item => {
-            $('#firstoperation').append(new Option(item.Value, item.Key));
+            $('#firstoperation').append(new Option(item.value, item.key));
         })
     });
 
 
     $('#btnCalcResult').click(function () {
-        let operators = {
-            FirstArgument: +$('#firstargument').val(),
-            FirstOperation: +$('#firstoperation').val(),
-            SecondArgument: +$('#secondargument').val()
-        };
+        $('#error').text('');
+        let FirstOperand = $('#firstargument').val();
+        let FirstOperation = +$('#firstoperation').val();
+        let SecondOperand = $('#secondargument').val();
+
 
         $.ajax({
-            url: '/calculator/calculateresult',
-            method: 'POST',
+            url: `api/calculator/twoargumentresult?operand1=${FirstOperand}&operation=${FirstOperation}&operand2=${SecondOperand}`,
+            method: 'get',
             dataType: 'json',
-            data: JSON.stringify(operators),
             contentType: 'application/json',
             success: function (result) {
-                $('#result').val(result.result);
+                if (result.hasError) {
+                    $('#error').text(result.errorMessage);
+                } else {
+                    $('#result').val(result.data);
+                }
             }
         });
     });

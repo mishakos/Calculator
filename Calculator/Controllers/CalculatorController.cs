@@ -1,36 +1,31 @@
-﻿using Calculator.Services.Services;
-using Calculator.Services.ViewModels;
+﻿using Calculator.Services;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Calculator.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class CalculatorController : ControllerBase
     {
         private readonly ILogger<CalculatorController> logger;
-        private readonly ICalculationService service;
 
-        public CalculatorController(ILogger<CalculatorController> logger, ICalculationService service)
+        public CalculatorController(ILogger<CalculatorController> logger)
         {
             this.logger = logger;
-            this.service = service;
         }
 
-        [HttpPost("calculateresult")]
-        public IActionResult CalculateResult([FromBody]InputDataViewModel model)
+        [HttpGet("twoargumentresult")]
+        public IActionResult GetResult(string operand1, int operation, string operand2)
         {
-            return Ok(new { result = service.GetResult(model) });
-        }
-
-        [HttpGet("operationtypes")]
-        public IActionResult GetOperationTypes()
-        {
-            return Ok(service.GetOperationTypes().ToList());
+            var formula = new LinkedList<string>();
+            formula.AddLast(operand1);
+            formula.AddLast(operation.ToString());
+            formula.AddLast(operand2);
+            return Ok(CalcService.GetTwoArgumentResult(formula));
         }
     }
 }
